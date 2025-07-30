@@ -12,3 +12,4 @@ bool isEscape(char key) {
 bool isEnter(char key) {
     return key == '\r' || key == '\n'; // selon le terminal
 }
+

@@ -72,17 +72,17 @@ std::string detectOBDPort() {
         const std::string& portName = info.portName;
         const std::string& description = info.description;
 
-        // Ignorer les ports Bluetooth ou non désirés
+        
         if (description.find("Bluetooth") != std::string::npos) {
-            std::cout << "⏭️ " << portName << " ignoré (Bluetooth détecté : " << description << ")" << std::endl;
+            std::cout << portName << " ignoré (Bluetooth détecté : " << description << ")" << std::endl;
             continue;
         }
 
-        std::cout << "\n🔍 Test du port : " << portName << " (" << description << ") ... ";
+        std::cout << "\n Test du port : " << portName << " (" << description << ") ... ";
 
         try {
             io_context io;
-            serial_port serial(io, "\\\\.\\" + portName); // important pour COM10+ sur Windows
+            serial_port serial(io, "\\\\.\\" + portName); 
 
             serial.set_option(serial_port_base::baud_rate(9600));
             serial.set_option(serial_port_base::character_size(8));
@@ -90,7 +90,7 @@ std::string detectOBDPort() {
             serial.set_option(serial_port_base::parity(serial_port_base::parity::none));
             serial.set_option(serial_port_base::flow_control(serial_port_base::flow_control::none));
 
-            std::cout << "✅ Ouvert. Envoi de 'ATI\\r'..." << std::endl;
+            std::cout << "Ouvert. Envoi de 'ATI\\r'..." << std::endl;
 
             std::string cmd = "ATI\r";
             write(serial, buffer(cmd));
@@ -111,24 +111,24 @@ std::string detectOBDPort() {
             if (responseFuture.wait_for(std::chrono::seconds(5)) == std::future_status::ready) {
                 std::string reply = responseFuture.get();
                 if (!reply.empty()) {
-                    std::cout << "📥 Réponse : " << reply << std::endl;
+                    std::cout << "Réponse : " << reply << std::endl;
                     if (reply.find("ELM") != std::string::npos) {
-                        std::cout << "✅ Port OBD détecté !" << std::endl;
+                        std::cout << "Port OBD détecté !" << std::endl;
                         readerThread.join();
                         return portName;
                     } else {
-                        std::cout << "❌ Pas de signature ELM." << std::endl;
+                        std::cout << "Pas de signature ELM." << std::endl;
                     }
                 } else {
-                    std::cout << "❌ Lecture échouée." << std::endl;
+                    std::cout << "Lecture échouée." << std::endl;
                 }
             } else {
-                std::cout << "⏱️ Timeout — aucune réponse." << std::endl;
+                std::cout << "Timeout — aucune réponse." << std::endl;
                 readerThread.detach();
             }
 
         } catch (const std::exception& ex) {
-            std::cout << "❌ Erreur : " << ex.what() << std::endl;
+            std::cout << "Erreur : " << ex.what() << std::endl;
         }
     }
 
